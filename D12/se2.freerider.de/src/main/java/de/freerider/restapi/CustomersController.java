@@ -77,7 +77,12 @@ class CustomersController implements CustomersAPI {
                 Object value = kvpairs.get(key);
                 System.out.println(" [ " + key + ", " + value + " ]");
             });
-            Optional newCustomer = accept(kvpairs);
+            Optional newCustomer = null;
+            try {
+                newCustomer = accept(kvpairs);
+            } catch (ConflictException e) {
+                return new ResponseEntity<>(null,HttpStatus.CONFLICT);
+            }
             if (newCustomer.isPresent()) {
 
                 customerRepository.save((Customer) newCustomer.get());
@@ -89,7 +94,7 @@ class CustomersController implements CustomersAPI {
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
-    private Optional<Customer> accept(Map<String, Object> kvpairs) {
+    private Optional<Customer> accept(Map<String, Object> kvpairs) throws ConflictException{
         Long newID;
         if (!kvpairs.containsKey("id")) {
             do {
@@ -98,6 +103,7 @@ class CustomersController implements CustomersAPI {
         } else {
             newID = Long.valueOf( kvpairs.get("id").toString());
         }
+        if (customerRepository.existsById(newID)) throw new ConflictException();
         if (newID <= 0) {
             return Optional.empty();
         }
