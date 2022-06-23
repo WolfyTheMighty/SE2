@@ -1,6 +1,8 @@
 package de.freerider.app;
 
 import de.freerider.datamodel.Customer;
+import de.freerider.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,7 +17,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 // tell Spring where to scan for @Components, @Controllers, @Services
 @ComponentScan( basePackages = { "de.freerider.restapi" } )
 @SpringBootApplication
-public class AppApplication {
+public class Application {
+    @Autowired
+    CustomerRepository customerRepository;
     @EventListener( ApplicationReadyEvent.class )
     public void runAfterSpringStartup() { // runs when Spring is ready, fills repo when empty
 //
@@ -25,7 +29,7 @@ public class AppApplication {
                             .setId( 1 )
                             .setName( "Eric", "Meyer" )
                             .addContact( "eric98@yahoo.com" )
-                    addContact( "(030) 3945‐642298" )
+                    .addContact( "(030) 3945‐642298" )
             );
             customerRepository.save( new Customer()
                     .setId( 2 )
